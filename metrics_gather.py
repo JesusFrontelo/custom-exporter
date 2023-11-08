@@ -8,7 +8,7 @@ import argparse
 import sso_session
 import ec2_metrics_def
 import rds_metrics_def
-from prometheus_client import start_http_server
+from prometheus_client import start_http_server, Info
 
 ### Comenzamos la colecta de métricas ###
 
@@ -80,3 +80,5 @@ while True:
     import time
     time.sleep(60)
 
+i = Info('custom_exporter_build', 'Description of info')
+i.info({'version': '0.1', 'Author': 'Jesús Frontelo'})

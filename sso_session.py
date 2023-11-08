@@ -10,12 +10,10 @@
 
 import argparse
 import boto3
-import subprocess
+import syslog
 
 from botocore.credentials import RefreshableCredentials
 from botocore.session import get_session
-from datetime import datetime, timedelta, timezone
-from prometheus_client import start_http_server
 
 parser = argparse.ArgumentParser(description='Script de Sesiones')
 parser.add_argument('--role', type=str, required=False, help='ARN del rol')
@@ -24,42 +22,59 @@ args = parser.parse_args()
 role_arn = args.role
 port = args.port
 
-sts_client = boto3.client("sts", region_name='eu-west-1')
+# Iniciar el registro del sistema
+syslog.openlog(ident='custom_exporter', logoption=syslog.LOG_PID, facility=syslog.LOG_LOCAL0)
 
-response = sts_client.assume_role(
-    RoleArn=role_arn,
-    RoleSessionName='my-session',
-).get("Credentials")
+try:
+    syslog.syslog(syslog.LOG_INFO, 'Openning conection boto3 STS')
+    sts_client = boto3.client("sts", region_name='eu-west-1')
 
-metadata = {
-    "access_key": response.get("AccessKeyId"),
-    "secret_key": response.get("SecretAccessKey"),
-    "token": response.get("SessionToken"),
-    "expiry_time": response.get("Expiration").isoformat(),
-}
-
-def refresh():
-    #" Refresh tokens by calling assume_role again "
-    params = {
-        "RoleArn": role_arn,
-        "RoleSessionName": 'my-session',
-        "DurationSeconds": 3600,
-    }
-
-    #response = self.sts_client.assume_role(**params).get("Credentials")
     response = sts_client.assume_role(
         RoleArn=role_arn,
         RoleSessionName='my-session',
     ).get("Credentials")
 
-    credentials = {
+    metadata = {
         "access_key": response.get("AccessKeyId"),
         "secret_key": response.get("SecretAccessKey"),
         "token": response.get("SessionToken"),
         "expiry_time": response.get("Expiration").isoformat(),
     }
 
-    return credentials
+    syslog.syslog(syslog.LOG_INFO, 'STS Conecction success')
+except Exception as e:
+    syslog.syslog(syslog.LOG_ERR, f'Error stablishing STS connection: {str(e)}')
+
+
+def refresh():
+
+    try:
+
+        # Refresh tokens by calling assume_role again
+        params = {
+            "RoleArn": role_arn,
+            "RoleSessionName": 'my-session',
+            "DurationSeconds": 3600,
+        }
+
+        #response = self.sts_client.assume_role(**params).get("Credentials")
+        response = sts_client.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName='my-session',
+        ).get("Credentials")
+
+        credentials = {
+            "access_key": response.get("AccessKeyId"),
+            "secret_key": response.get("SecretAccessKey"),
+            "token": response.get("SessionToken"),
+            "expiry_time": response.get("Expiration").isoformat(),
+        }
+
+        syslog.syslog(syslog.LOG_INFO, 'Session Tokens succesfully updated')
+        return credentials
+
+    except Exception as e:
+        syslog.syslog(syslog.LOG_ERR, f'Error while updating Session Tokens: {str(e)}')
 
 session_credentials = RefreshableCredentials.create_from_metadata(
     metadata=refresh(),
@@ -73,7 +88,7 @@ session.set_config_variable("region", 'eu-west-1')
 autorefresh_session = boto3.Session(botocore_session=session)
 
 rds_client = autorefresh_session.client(
-    "rds", 
+    "rds",
     region_name='eu-west-1'
 )
 
@@ -81,5 +96,3 @@ ec2_client = autorefresh_session.client(
     "ec2",
     region_name='eu-west-1'
 )
-
-print(response.get("Expiration").isoformat())
