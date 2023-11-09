@@ -6,3 +6,9 @@ allocated_storage_metric = Gauge(
     'Allocated Storage of RDS Instance',
     ['dbinstance_identifier', 'instance_class', 'engine_version', 'availability_zone', 'pending_maintenance', 'status']
 )
+
+dbinstance_state_metric = Gauge(
+    'rds_status',
+    'Status of RDS Instance',
+    ['dbinstance_identifier', 'instance_class', 'engine_version', 'availability_zone', 'pending_maintenance', 'status']
+)

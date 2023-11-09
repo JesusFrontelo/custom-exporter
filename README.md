@@ -50,6 +50,17 @@ Restart=on-failure
 WantedBy=multi-user.target
 ````
 
+Once you have it running you can create a job in prometheus.yml. 
+
+````
+  - job_name: '<Job Name>'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ['localhost:<Port>']
+
+````
+
+
 ### Definiton of each file
 
 If you plan to add new metrics to the exporter, this info is useful to know where to config each thing. 

@@ -73,6 +73,16 @@ while True:
                         status # Agrega la etiqueta del estado de la RDS (available, stopped, creating ...)
                     ).set(allocated_storage)
 
+                if dbinstance_identifier and allocated_storage is not None:
+                    rds_metrics_def.dbinstance_state_metric.labels(
+                        dbinstance_identifier,
+                        instance_class,  # Agrega la etiqueta de clase de instancia
+                        engine_version, # Agrega la etiqueta de version del engine
+                        availability_zone, # Agrega la etiqueta de region la AZ
+                        pending_maintenance, # Agrega la etiqueta del estado del pending maintenance
+                        status # Agrega la etiqueta del estado de la RDS (available, stopped, creating ...)
+                    ).set(1 if status == 'available' else 0)                    
+
     except Exception as e:
        print(f'Error al obtener métricas::{str(e).encode("utf-8")}')
 
