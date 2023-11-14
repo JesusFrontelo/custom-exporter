@@ -96,3 +96,13 @@ ec2_client = autorefresh_session.client(
     "ec2",
     region_name='eu-west-1'
 )
+
+elb_client = autorefresh_session.client(
+    "elbv2",
+    region_name='eu-west-1'
+)
+
+cloudwatch_client = autorefresh_session.client(
+    "cloudwatch",
+    region_name='eu-west-1'
+)

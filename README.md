@@ -24,7 +24,7 @@ python3 pip install <library>
 ````
 To start gathering metrics run:
 ````
-python3 metrics_gather.py 
+python3 custom_exporter.py 
 ````
 
 ## How to configure
@@ -43,7 +43,7 @@ After=network.target
 [Service]
 Type=simple
 User=<the user which has python access and libraries>
-ExecStart=/usr/bin/python3 /path/to/exporter/metrics_gather.py --role 'arn:aws:iam::123456789012:role/role_to_assume' --port 9900
+ExecStart=/usr/bin/python3 /path/to/exporter/custom_exporter.py --role 'arn:aws:iam::123456789012:role/role_to_assume' --port 9900
 Restart=on-failure
 
 [Install]
@@ -60,13 +60,14 @@ Once you have it running you can create a job in prometheus.yml.
 
 ````
 
-
 ### Definiton of each file
 
-If you plan to add new metrics to the exporter, this info is useful to know where to config each thing. 
+If you plan to add new metrics to the exporter, this info is useful to know where to config each thing.
 
-| FILE | DESCRIPTION |
-| :--: | ----------- |
-|sso_session.py | It has the configuration to stablish session with aws and creates each client (ec2, rds...). |
-|*_metrics_def.py | It has the definition of each metric. Here you can add new metrics definition (name of the metric, description and labels).|
-|metrics_gather.py | Here we collect metrics and assign it to a metric.|
+The first step is to define the metric at metrics_definition folder.
+
+For metrics definition go [here](./metrics_definition/)
+
+Then you need to set values to the metric and for each label of the metric. You can set this at gathers folder.
+
+To set values to metric and labels go [here](./gathers/)
