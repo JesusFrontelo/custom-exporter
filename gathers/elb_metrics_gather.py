@@ -1,5 +1,6 @@
 from sessions import sso_session
 import syslog
+#import json
 
 from metrics_definition import elb_metrics_def
 from datetime import datetime, timedelta
@@ -34,7 +35,7 @@ def elb_gather():
                 Period=60, # Intervalo de muestreo de 1 minuto
                 Statistics=['Sum']
             )
-    
+            #print(json.dumps(processed_bytes_statistics, indent=4, default=str))    
             if 'Datapoints' in processed_bytes_statistics and processed_bytes_statistics['Datapoints']:
                 elb_metrics_def.processed_bytes_metric.labels(
                     lb_name,
