@@ -19,3 +19,10 @@ processed_bytes_metric = Gauge(
     'Número total de bytes procesados por ELB',
     ['lb_name', 'lb_arn']
 )
+
+# Define la métrica de Prometheus para UnHealthyHost
+unhealthy_host_metric = Gauge (
+    'unhealthy_host',
+    'Target Group Unhealthy Host',
+    ['lb_name', 'lb_arn', 'target_group_name', 'target_group_arn']
+)
