@@ -26,7 +26,7 @@ start_http_server(sso_session.port)
 ### Definimos la versión del exporter
 
 i = Info('custom_exporter_version', 'Info')
-i.info({'version': '0.1', 'Author': 'Jesus Frontelo'})
+i.info({'version': '0.2.0', 'Author': 'Jesus Frontelo'})
 
 while True:
     try:
