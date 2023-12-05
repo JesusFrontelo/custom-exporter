@@ -1,0 +1,165 @@
+stages: 
+  - build
+  - deploy
+  - activate
+  - generate
+
+build:
+  stage: build
+  tags:
+    - shell
+  when: manual
+  allow_failure: false
+  image: 
+    name: ${ECR_REGISTRY}arquitectura-group/docker-images/shell-executor:v1.0.0
+  variables:
+    GATHERER: 'custom_exporter.tar'
+    SERVICES: 'custom_services.tar'
+    #CI_DEBUG_TRACE: "true"    
+  
+  script:
+    # Compress gather
+    - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" -cvzf $GATHERER .
+    # Compress services
+    - cd services/ && tar -cvzf ../$SERVICES .
+
+  artifacts:
+    paths:
+      - $GATHERER
+      - $SERVICES
+    expire_in: 1 day
+
+deploy_pre:
+  stage: deploy
+  when: on_success
+  allow_failure: false  
+  needs: 
+    - build
+  tags:
+    - shell
+  only:
+    refs:
+      - develop
+  variables:
+    GATHERS_PATH: '/opt/prometheus/custom_exporter'
+    SERVICES_PATH: '/etc/systemd/system'
+    TEMP_PATH: '/tmp/custom_services'
+    GATHERER: 'custom_exporter.tar'
+    SERVICES: 'custom_services.tar'
+ 
+  script:
+    # Copying GATHERER to instance
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE "if [ ! -d $GATHERS_PATH ]; then mkdir /opt/prometheus/custom_exporter ; fi"
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$GATHERER $USER@$IP_PRE:$GATHERS_PATH/
+    # Copying SERVICES to instance
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE "if [ ! -d $TEMP_PATH ]; then mkdir /tmp/custom_services ; fi"
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$SERVICES $USER@$IP_PRE:$TEMP_PATH/    
+    # Uncompress GATHERER
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE tar -xvzf $GATHERS_PATH/$GATHERER -C $GATHERS_PATH
+    # Uncompress SERVICES
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE sudo tar -xvzf $TEMP_PATH/$SERVICES -C $SERVICES_PATH
+    # Change owner, group and permision to service files
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE sudo chown root:root $SERVICES_PATH/custom-exporter-*.service
+    - sshpass -p $PASSWORD ssh $USER@$IP_PRE sudo chmod 644 $SERVICES_PATH/custom-exporter-*.service
+    # Cleaning GATHERER tar file
+    - sshpass -p $PASSWORD ssh -q $USER@$IP_PRE rm -f $GATHERS_PATH/$GATHERER  
+    # Cleaning SERVICES tar file
+    - sshpass -p $PASSWORD ssh -q $USER@$IP_PRE rm -f $TEMP_PATH/$SERVICES    
+  
+  dependencies:
+    - build  
+
+activate_pre:
+  stage: activate
+  when: on_success
+  allow_failure: false    
+  needs: 
+    - build
+    - deploy_pre
+  tags:
+    - shell
+  only:
+    refs:
+      - develop
+  variables:
+    PASSWORD: "$PASSWORD"
+    CI_DEBUG_TRACE: "true"
+
+  script:
+    # Check var action to determine if 'kill -hup' or 'daemon-reload' services
+    # Should daemon-reload and enable new service only
+    sshpass -p $PASSWORD ssh -q $USER@$IP_PRE sudo systemctl daemon-reload
+    sshpass -p $PASSWORD ssh -q $USER@$IP_PRE sudo systemctl enable custom-exporter-*
+    sshpass -p $PASSWORD ssh -q $USER@$IP_PRE sudo systemctl start custom-exporter-*
+
+  dependencies:
+    - build
+    - deploy_pre  
+
+
+##############################
+######## PRO PIPELINE ########
+##############################
+
+deploy_pro:
+  stage: deploy
+  when: on_success  
+  tags:
+    - shell
+  image: 
+    name: ${ECR_REGISTRY}arquitectura-group/docker-images/shell-executor:1.0.0Bu
+  only:
+    refs:
+      - master
+  variables:
+    PASSWORD: "$PASSWORD"
+    GATHERS_PATH: '/opt/prometheus/custom_exporter/config'
+    SERVICES_PATH: '/etc/systemd/system'
+    GATHERER: 'custom_exporter.tar'
+    SERVICES: 'custom_services.tar'  
+    TEMP_PATH: '/tmp/custom_services'
+    FOLDER: '/opt/prometheus/custom_exporter/config'           
+
+  script:
+    # Copying GATHERER to instance
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$GATHERER $USER@$IP:$GATHERS_PATH/
+    # Copying SERVICES to instance
+    - sshpass -p $PASSWORD ssh -q $USER@$IP "if [ ! -d $TEMP_PATH ]; then mkdir /tmp/custom_services ; fi" 
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$SERVICES $USER@$IP:$TEMP_PATH/    
+    # Uncompress GATHERER
+    - sshpass -p $PASSWORD ssh -q $USER@$IP tar -xvzf $GATHERS_PATH/$GATHERER -C $GATHERS_PATH
+    # Uncompress SERVICES
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo tar -xvzf $TEMP_PATH/$SERVICES -C $SERVICES_PATH
+    # Change owner, group and permision to service files
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo chown root:root $SERVICES_PATH/custom-exporter-*.service
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo chmod 644 $SERVICES_PATH/custom-exporter-*.service
+    # Cleaning GATHERER tar file
+    - sshpass -p $PASSWORD ssh -q $USER@$IP rm -f $GATHERS_PATH/$GATHERER  
+    # Cleaning SERVICES tar file
+    - sshpass -p $PASSWORD ssh -q $USER@$IP rm -f $TEMP_PATH/$SERVICES 
+
+  dependencies:
+    - build  
+
+activate_pro:
+  stage: activate
+  when: on_success  
+  tags:
+    - shell
+  image: 
+    name: ${ECR_REGISTRY}arquitectura-group/docker-images/shell-executor:1.0.0
+  only:
+    refs:
+      - master
+  variables:
+    PASSWORD: "$PASSWORD"
+    SOURCE: "./RULE_CREATOR/prometheus_pro.yml"
+    FOLDER: '/opt/prometheus/prometheus/prometheus.yml'
+  script:
+    # Restarting service
+    - sshpass -p $PASSWORD ssh -q $USER@$IP "sudo ps -aux| grep -i \"custom\" |grep \"yml\" |grep -v \"bash -c\" |awk -F \" \" '{print \$2}' > /tmp/custom_pids.txt"
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo kill -hup `sshpass -p $PASSWORD ssh $USER@$IP cat /tmp/custom_pids.txt`
+    - sshpass -p $PASSWORD ssh -q $USER@$IP "sudo systemctl list-unit-files |grep disabled |grep custom-exporter- |awk -F \" \" '{print \$1}' > /tmp/new_services.tmp"
+    - sshpass -p $PASSWORD ssh -q $USER@$IP 'for service in `cat /tmp/new_services.tmp`;do sudo systemctl enable $service; done'
+    - sshpass -p $PASSWORD ssh -q $USER@$IP 'for service in `cat /tmp/new_services.tmp`;do sudo systemctl start $service; done'
+    #- sshpass -p $PASSWORD ssh -q $USER@$IP for service in `systemctl list-unit-files |grep disabled |grep custom-exporter- |awk -F " " '{print $1}'`;do systemctl enable $service; done    
