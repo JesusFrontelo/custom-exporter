@@ -19,7 +19,7 @@ build:
   
   script:
     # Compress gather
-    - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" -cvzf $GATHERER .
+    - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" --warning=no-file-changed -cvzf $GATHERER .
     # Compress services
     - cd services/ && tar -cvzf ../$SERVICES .
 
