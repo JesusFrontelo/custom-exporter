@@ -15,7 +15,7 @@ build:
   variables:
     GATHERER: 'custom_exporter.tar'
     SERVICES: 'custom_services.tar'
-    #CI_DEBUG_TRACE: "true"    
+    CI_DEBUG_TRACE: "true"    
   
   script:
     # Compress gather
