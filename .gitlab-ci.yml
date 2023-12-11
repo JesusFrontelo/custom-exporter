@@ -18,7 +18,6 @@ build:
     CI_DEBUG_TRACE: "true"    
   
   script:
-    - echo 
    # Compress gather
    - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" --warning=no-file-changed -cvzf $GATHERER . || true
    # Compress services
