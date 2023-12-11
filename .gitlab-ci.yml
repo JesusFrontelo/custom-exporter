@@ -18,10 +18,11 @@ build:
     CI_DEBUG_TRACE: "true"    
   
   script:
-    # Compress gather
-    - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" --warning=no-file-changed -cvzf $GATHERER .
-    # Compress services
-    - cd services/ && tar -cvzf ../$SERVICES .
+    - echo 
+   # Compress gather
+   - tar --exclude="./services" --exclude="./.git" --exclude=".gitlab-ci.yml" --exclude="$GATHERER" --warning=no-file-changed -cvzf $GATHERER . || true
+   # Compress services
+   - cd services/ && tar -cvzf ../$SERVICES .
 
   artifacts:
     paths:
