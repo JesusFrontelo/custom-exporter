@@ -50,17 +50,17 @@ deploy_pre:
   script:
     # Copying GATHERER to instance
     - sshpass -p $PASSWORD ssh $USER@$IP "if [ ! -d $GATHERS_PATH ]; then mkdir /opt/prometheus/custom_exporter ; fi"
-    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$GATHERER $USER@$IP_PRE:$GATHERS_PATH/
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$GATHERER $USER@$IP:$GATHERS_PATH/
     # Copying SERVICES to instance
     - sshpass -p $PASSWORD ssh $USER@$IP "if [ ! -d $TEMP_PATH ]; then mkdir /tmp/custom_services ; fi"
-    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$SERVICES $USER@$IP_PRE:$TEMP_PATH/    
+    - sshpass -p $PASSWORD scp -o StrictHostKeyChecking=no ./$SERVICES $USER@$IP:$TEMP_PATH/    
     # Uncompress GATHERER
     - sshpass -p $PASSWORD ssh $USER@$IP tar -xvzf $GATHERS_PATH/$GATHERER -C $GATHERS_PATH
     # Uncompress SERVICES
-    - sshpass -p $PASSWORD ssh $USER@$IP_PRE sudo tar -xvzf $TEMP_PATH/$SERVICES -C $SERVICES_PATH
+    - sshpass -p $PASSWORD ssh $USER@$IP sudo tar -xvzf $TEMP_PATH/$SERVICES -C $SERVICES_PATH
     # Change owner, group and permision to service files
     - sshpass -p $PASSWORD ssh $USER@$IP sudo chown root:root $SERVICES_PATH/custom-exporter-*.service
-    - sshpass -p $PASSWORD ssh $USER@$IP_PRE sudo chmod 644 $SERVICES_PATH/custom-exporter-*.service
+    - sshpass -p $PASSWORD ssh $USER@$IP sudo chmod 644 $SERVICES_PATH/custom-exporter-*.service
     # Cleaning GATHERER tar file
     - sshpass -p $PASSWORD ssh -q $USER@$IP rm -f $GATHERS_PATH/$GATHERER  
     # Cleaning SERVICES tar file
