@@ -88,9 +88,9 @@ activate_pre:
   script:
     # Check var action to determine if 'kill -hup' or 'daemon-reload' services
     # Should daemon-reload and enable new service only
-    sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl daemon-reload
-    sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl enable custom-exporter-*
-    sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl start custom-exporter-*
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl daemon-reload
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl enable custom-exporter-*
+    - sshpass -p $PASSWORD ssh -q $USER@$IP sudo systemctl start custom-exporter-*
 
   dependencies:
     - build
