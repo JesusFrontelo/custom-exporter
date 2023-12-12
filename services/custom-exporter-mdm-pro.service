@@ -1,5 +1,5 @@
 [Unit]
-    Description=Python Exporter for MDM PRO
+    Description= Python Exporter for MDM PRO
 
     [Service]
     User=prometheus_ci

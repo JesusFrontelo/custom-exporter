@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Atenena PRE
+Description= Python Exporter for Atenena PRE
 
 [Service]
 User=prometheus_ci

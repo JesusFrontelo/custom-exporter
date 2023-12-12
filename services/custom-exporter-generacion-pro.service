@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Generacion Pro
+Description= Python Exporter for Generacion Pro
 
 [Service]
 User=prometheus_ci

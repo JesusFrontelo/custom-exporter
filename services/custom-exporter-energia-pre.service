@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Energia Pre
+Description= Python Exporter for Energia Pre
 
 [Service]
 User=prometheus_ci

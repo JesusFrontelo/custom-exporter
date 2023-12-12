@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Retail Pro
+Description= Python Exporter for Retail Pro
 
 [Service]
 User=prometheus_ci

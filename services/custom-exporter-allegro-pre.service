@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Allegro Pre
+Description= Python Exporter for Allegro Pre
 
 [Service]
 User=prometheus_ci

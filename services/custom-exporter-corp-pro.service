@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Corp Pro
+Description= Python Exporter for Corp Pro
 
 [Service]
 User=prometheus_ci

@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Transversal Pro
+Description= Python Exporter for Transversal Pro
 
 [Service]
 User=prometheus_ci

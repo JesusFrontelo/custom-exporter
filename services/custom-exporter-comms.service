@@ -1,5 +1,5 @@
 [Unit]
-Description=Python Exporter for Comms
+Description= Python Exporter for Comms
 
 [Service]
 User=prometheus_ci
