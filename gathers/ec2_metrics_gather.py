@@ -33,7 +33,6 @@ def ec2_gather():
                 ec2_metrics_def.instance_launch_time_metric.labels(
                     instance_id,
                     instance_type,
-                    state
                 ).set(launch_timestamp)
 
     except Exception as e:

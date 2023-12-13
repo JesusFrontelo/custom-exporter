@@ -12,5 +12,5 @@ instance_state_metric = Gauge(
 instance_launch_time_metric = Gauge(
     'ec2_launch_time',
     'Hora de inicio de las instancias EC2',
-    ['instance_id', 'instance_type', 'state']
+    ['instance_id', 'instance_type']
     )
