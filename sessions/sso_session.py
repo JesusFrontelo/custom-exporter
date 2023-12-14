@@ -59,39 +59,41 @@ if role_arn:
     try:
         syslog.syslog(syslog.LOG_INFO, 'Openning conection boto3 STS')
         sts_client = boto3.client("sts", region_name='eu-west-1')
-    
+
         response = sts_client.assume_role(
             RoleArn=role_arn,
             RoleSessionName='my-session',
         ).get("Credentials")
-    
+
         metadata = {
             "access_key": response.get("AccessKeyId"),
             "secret_key": response.get("SecretAccessKey"),
             "token": response.get("SessionToken"),
             "expiry_time": response.get("Expiration").isoformat(),
         }
-    
+
         syslog.syslog(syslog.LOG_INFO, 'STS Conecction success')
     except Exception as e:
         syslog.syslog(syslog.LOG_ERR, f'Error stablishing STS connection: {str(e)}')
-    
-    
+
+
     session_credentials = RefreshableCredentials.create_from_metadata(
         metadata=refresh(),
         refresh_using=refresh,
         method="sts-assume-role",
     )
-    
+
     session = get_session()
     session._credentials = session_credentials
     session.set_config_variable("region", 'eu-west-1')
     autorefresh_session = boto3.Session(botocore_session=session)
-    
+
     rds_client = autorefresh_session.client("rds",region_name='eu-west-1')
     ec2_client = autorefresh_session.client("ec2",region_name='eu-west-1')
     elb_client = autorefresh_session.client("elbv2",region_name='eu-west-1')
     cloudwatch_client = autorefresh_session.client("cloudwatch",region_name='eu-west-1')
+    health_client = autorefresh_session.client("health",region_name='us-east-1')
+
 else:
     # Utilizar las credenciales del perfil de instancia directamente
     syslog.syslog(syslog.LOG_INFO, 'Using instance profile credentials directly')
@@ -101,4 +103,5 @@ else:
     rds_client = boto3.client("rds", region_name='eu-west-1')
     ec2_client = boto3.client("ec2", region_name='eu-west-1')
     elb_client = boto3.client("elbv2", region_name='eu-west-1')
-    cloudwatch_client = boto3.client("cloudwatch", region_name='eu-west-1')    
+    cloudwatch_client = boto3.client("cloudwatch", region_name='eu-west-1')
+    health_client = boto3.client("health",region_name='us-east-1')

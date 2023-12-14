@@ -40,6 +40,9 @@ while True:
         ### ELB Metrics Gathering ###
         elb_metrics_gather.elb_gather()
 
+        ### HEALTH Metrics Gathering ###
+        health_metrics_gather.health_gather()
+
     except Exception as e:
        # Registra cualquier excepción que ocurra durante la obtención de métricas       
        syslog.syslog(syslog.LOG_ERR, f'Error al obtener métricas: {str(e)}')
