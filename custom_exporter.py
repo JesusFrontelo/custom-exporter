@@ -9,9 +9,7 @@ import sys
 import time
 import syslog
 
-from gathers import ec2_metrics_gather
-from gathers import rds_metrics_gather
-from gathers import elb_metrics_gather
+from gathers import ec2_metrics_gather, rds_metrics_gather, elb_metrics_gather, health_metrics_gather
 from sessions import sso_session
 from prometheus_client import start_http_server, Info
 
