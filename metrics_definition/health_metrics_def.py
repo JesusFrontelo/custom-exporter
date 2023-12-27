@@ -11,10 +11,10 @@ health_events_metric = Gauge(
      'startTime',
      'lastUpdatedTime',
      'latestDescription',
-      'arn',
-      'eventTypeCategory',
-      'availabilityZone',
-      'eventScopeCode',
-      'affected_entities'
+     'event_arn',
+     'eventTypeCategory',
+     'availabilityZone',
+     'eventScopeCode',
+     'arn'
     ]
 )

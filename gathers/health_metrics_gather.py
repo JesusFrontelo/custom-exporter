@@ -28,11 +28,9 @@ def health_gather():
                 affected_entities_response = sso_session.health_client.describe_affected_entities(filter={
                     'eventArns': [event_arn]
                 })
-
                 # Extraemos la información del evento desde la respuesta
                 event_details = event_details_response['successfulSet'][0]['event']
                 event_description =  event_details_response['successfulSet'][0]['eventDescription']
-
 
                 service = event['service']
                 region = event.get('region', 'N/A')
@@ -43,7 +41,6 @@ def health_gather():
                 latestDescription  = event_description['latestDescription'] # Accede a latestDescription en eventDescription
                 arn = event_details['arn']
                 eventTypeCategory = event_details['eventTypeCategory']
-                availabilityZone = event_details.get('availabilityZone', 'N/A')
                 eventScopeCode = event_details['eventScopeCode']
 
                 # Extraemos las entidades afectadas y las convertimos en una lista de cadenas
@@ -58,20 +55,20 @@ def health_gather():
                 # Define y establece el valor de la métrica con las etiquetas
     #            if statusCode.lower() in ['open', 'upcoming'] and ((startTime and startTime > current_time) or (lastUpdatedTime and lastUpdatedTime > current_time)):
                 if statusCode and  statusCode.lower() not in ['closed']:
-                    health_metrics_def.health_events_metric.labels(
-                        service,
-                        region,
-                        eventType,
-                        statusCode,
-                        startTime,
-                        lastUpdatedTime,
-                        latestDescription,
-                        arn,
-                        eventTypeCategory,
-                        availabilityZone,
-                        eventScopeCode,
-                        affected_entities
-                    ).set(1)
+                    for entity in affected_entities:
+                        health_metrics_def.health_events_metric.labels(
+                            service,
+                            region,
+                            eventType,
+                            statusCode,
+                            startTime,
+                            lastUpdatedTime,
+                            latestDescription,
+                            arn,
+                            eventTypeCategory,
+                            eventScopeCode,
+                            entity
+                        ).set(1)
 
             except Exception as e:
                 # Manejar la excepción al obtener detalles del evento
