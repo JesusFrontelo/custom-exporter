@@ -46,7 +46,7 @@ def rds_gather():
                 # Datos de la RDS.
                 pending = sso_session.rds_client.describe_pending_maintenance_actions(Filters=[{'Name': 'db-instance-id', 'Values': [arn]}])
                 actions = pending.get('PendingMaintenanceActions', [])
-                print(json.dumps(pending, indent=4, default=str))
+#                print(json.dumps(pending, indent=4, default=str))
 
                 for action in actions:
                     for action_detail in action['PendingMaintenanceActionDetails']:
@@ -62,10 +62,10 @@ def rds_gather():
                             availability_zone, # Agrega la etiqueta de region la AZ
                             preferred_maintenance_window, # Agrega la etiqueta del estado del pending maintenance
                             arn, # Agrega la etiqueta del ARN de la RDS
-                            pending_action,
-                            pending_apply,
-                            date2,
-                            pending_description
+                            pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
+                            pending_apply, # Agrega la etiqueta con el estado de la aplicación de mantenimiento
+                            date2, 
+                            pending_description # Agrega la etiqueta con la descripción de las acciones a realizar
                         ).set(1)
 
 
