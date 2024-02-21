@@ -1,8 +1,7 @@
 from sessions import sso_session
-from metrics_definition import rds_metrics_def
-
 import syslog
 import json
+from metrics_definition import rds_metrics_def
 import re
 
 def rds_gather():
@@ -18,10 +17,12 @@ def rds_gather():
                 allocated_storage = db_instance.get('AllocatedStorage')
                 instance_class = db_instance.get('DBInstanceClass')
                 engine_version = db_instance.get('EngineVersion')
+                engine = db_instance.get('Engine')
                 availability_zone = db_instance.get('AvailabilityZone')
                 preferred_maintenance_window = db_instance.get('PreferredMaintenanceWindow')
                 status = db_instance.get('DBInstanceStatus')
                 arn = db_instance.get('DBInstanceArn')
+#                print (db_instance.get('Engine'))
 
                 if dbinstance_identifier and allocated_storage is not None:
                     rds_metrics_def.allocated_storage_metric.labels(
