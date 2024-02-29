@@ -46,6 +46,7 @@ deploy_pre:
     TEMP_PATH: '/tmp/custom_services'
     GATHERER: 'custom_exporter.tar'
     SERVICES: 'custom_services.tar'
+    CI_DEBUG_TRACE: "true"        
  
   script:
     # Copying GATHERER to instance
