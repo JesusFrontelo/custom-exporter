@@ -16,5 +16,5 @@ dbinstance_state_metric = Gauge(
 dbinstance_maintenance_metric = Gauge (
     'rds_maintenance',
     'Maintenance Actions for RDS',
-    ['dbinstance_identifier', 'instance_class', 'engine_version', 'availability_zone', 'pending_maintenance', 'arn', 'pending_action', 'pending_apply', 'pending_description']
+    ['dbinstance_identifier', 'engine_version', 'pending_maintenance', 'arn', 'pending_action', 'pending_apply', 'pending_description']
 )

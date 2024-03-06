@@ -68,9 +68,7 @@ def rds_gather():
 
                                 rds_metrics_def.dbinstance_maintenance_metric.labels(
                                     dbinstance_identifier,
-                                    instance_class,  # Agrega la etiqueta de clase de instancia
                                     engine_version, # Agrega la etiqueta de version del engine
-                                    availability_zone, # Agrega la etiqueta de region la AZ
                                     preferred_maintenance_window, # Agrega la etiqueta del estado del pending maintenance
                                     arn, # Agrega la etiqueta del ARN de la RDS
                                     pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
@@ -81,9 +79,7 @@ def rds_gather():
                         if pending_apply is not 'N/A':
                             rds_metrics_def.dbinstance_maintenance_metric.labels(
                                 dbinstance_identifier,
-                                instance_class,  # Agrega la etiqueta de clase de instancia
                                 engine_version, # Agrega la etiqueta de version del engine
-                                availability_zone, # Agrega la etiqueta de region la AZ
                                 preferred_maintenance_window, # Agrega la etiqueta del estado del pending maintenance
                                 arn, # Agrega la etiqueta del ARN de la RDS
                                 pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
