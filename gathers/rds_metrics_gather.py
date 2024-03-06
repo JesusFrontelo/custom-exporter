@@ -64,6 +64,7 @@ def rds_gather():
                             match = re.search(pattern, pending_description)
                             if match:
                                 date2 = match.group(1)
+                                pending_apply = date2
 
                                 rds_metrics_def.dbinstance_maintenance_metric.labels(
                                     dbinstance_identifier,
@@ -74,23 +75,21 @@ def rds_gather():
                                     arn, # Agrega la etiqueta del ARN de la RDS
                                     pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
                                     pending_apply, # Agrega la etiqueta con el estado de la aplicación de mantenimiento
-                                    date2,
                                     pending_description # Agrega la etiqueta con la descripción de las acciones a realizar
                                 ).set(1)
 
                         if pending_apply is not 'N/A':
-                                    rds_metrics_def.dbinstance_maintenance_metric.labels(
-                                        dbinstance_identifier,
-                                        instance_class,  # Agrega la etiqueta de clase de instancia
-                                        engine_version, # Agrega la etiqueta de version del engine
-                                        availability_zone, # Agrega la etiqueta de region la AZ
-                                        preferred_maintenance_window, # Agrega la etiqueta del estado del pending maintenance
-                                        arn, # Agrega la etiqueta del ARN de la RDS
-                                        pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
-                                        pending_apply, # Agrega la etiqueta con el estado de la aplicación de mantenimiento
-                                        date2,
-                                        pending_description # Agrega la etiqueta con la descripción de las acciones a realizar
-                                    ).set(1)
+                            rds_metrics_def.dbinstance_maintenance_metric.labels(
+                                dbinstance_identifier,
+                                instance_class,  # Agrega la etiqueta de clase de instancia
+                                engine_version, # Agrega la etiqueta de version del engine
+                                availability_zone, # Agrega la etiqueta de region la AZ
+                                preferred_maintenance_window, # Agrega la etiqueta del estado del pending maintenance
+                                arn, # Agrega la etiqueta del ARN de la RDS
+                                pending_action, # Agrega la etiqueta con la acción de mantenimiento que se va a realizar en la rds
+                                pending_apply, # Agrega la etiqueta con el estado de la aplicación de mantenimiento
+                                pending_description # Agrega la etiqueta con la descripción de las acciones a realizar
+                            ).set(1)
 
 
     except Exception as e:
