@@ -4,7 +4,7 @@ from prometheus_client import Gauge
 allocated_storage_metric = Gauge(
     'rds_allocated_storage',
     'Allocated Storage of RDS Instance',
-    ['dbinstance_identifier', 'instance_class', 'engine_version', 'availability_zone', 'pending_maintenance', 'arn']
+    ['dbinstance_identifier', 'instance_class', 'engine_version', 'arn']
 )
 
 dbinstance_state_metric = Gauge(
