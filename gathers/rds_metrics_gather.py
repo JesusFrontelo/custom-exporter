@@ -24,13 +24,14 @@ def rds_gather():
                 arn = db_instance.get('DBInstanceArn')
 #                print (db_instance.get('Engine'))
 
-                if dbinstance_identifier and allocated_storage is not None:
-                    rds_metrics_def.allocated_storage_metric.labels(
-                        dbinstance_identifier,
-                        instance_class,  # Agrega la etiqueta de clase de instancia
-                        engine_version, # Agrega la etiqueta de version del engine
-                        arn # Agrega la etiqueta del ARN de la RDS
-                    ).set(allocated_storage)
+                if 'DBClusterIdentifier' not in db_instance:
+                    if dbinstance_identifier and allocated_storage is not None:
+                        rds_metrics_def.allocated_storage_metric.labels(
+                            dbinstance_identifier,
+                            instance_class,  # Agrega la etiqueta de clase de instancia
+                            engine_version, # Agrega la etiqueta de version del engine
+                            arn # Agrega la etiqueta del ARN de la RDS
+                        ).set(allocated_storage)
 
                 if dbinstance_identifier and allocated_storage is not None:
                     rds_metrics_def.dbinstance_state_metric.labels(
