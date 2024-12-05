@@ -1,49 +1,52 @@
-####################################################################################
-#####                                                                          #####
-#####                               Metrics Gather                             #####
-#####                                                                          #####
-####################################################################################
-
 import os
 import sys
-import time
 import syslog
+import time
 
-from gathers import ec2_metrics_gather
-from gathers import rds_metrics_gather
-from gathers import elb_metrics_gather
 from sessions import sso_session
-from prometheus_client import start_http_server, Info
 
-## Establecemos el path del proyecto
+from prometheus_client import start_http_server, Info
+from prometheus_client.core import REGISTRY
+
+from gathers.rds_metrics_gather import RDSMetricsCollector
+from gathers.health_metrics_gather import HealthMetricsCollector
+from gathers.ec2_metrics_gather import EC2MetricsCollector
+#from gathers.elb_metrics_gather import ELBMetricsCollector
+
+# Establecemos el path del proyecto
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-### Comenzamos la colecta de métricas ###
+# Registrar el colector personalizado
+
+try:
+    ## Colector eventos AWS Health
+    REGISTRY.register(HealthMetricsCollector())
+
+    ## Colector EC2
+    REGISTRY.register(EC2MetricsCollector())
+
+    ## Colector RDS
+    REGISTRY.register(RDSMetricsCollector())
+
+    ## Colector ELB
+#    REGISTRY.register(ELBMetricsCollector())
+
+except Exception as e:
+    syslog.syslog(syslog.LOG_ERR, f'Error al registrar colectores: {str(e)}')
+    print(f'Error al registrar colectores: {str(e)}')  # Imprime el error en la consola para depuración
+    sys.exit(1)  # Termina el programa si no se pueden registrar los colectores
 
 # Inicia el servidor Prometheus en el puerto especificado
+print("Iniciando el servidor Prometheus en el puerto", sso_session.port)
 start_http_server(sso_session.port)
 
-### Definimos la versión del exporter
-
+# Definimos la versión del exporter
 i = Info('custom_exporter_version', 'Info')
-i.info({'version': '0.2.0', 'Author': 'Jesus Frontelo'})
+i.info({'version': '1.0.0', 'Author': 'Jesus Frontelo'})
 
-while True:
-    try:
-
-        ### EC2 Metrics Gathering ###
-        ec2_metrics_gather.ec2_gather()
-
-        ### RDS Metrics Gathering ###
-        rds_metrics_gather.rds_gather()
-
-        ### ELB Metrics Gathering ###
-        elb_metrics_gather.elb_gather()
-
-    except Exception as e:
-       # Registra cualquier excepción que ocurra durante la obtención de métricas       
-       syslog.syslog(syslog.LOG_ERR, f'Error al obtener métricas: {str(e)}')
-
-    # Agrega un retardo (por ejemplo, 60 segundos) antes de volver a obtener los datos
-    import time
-    time.sleep(60)
+# Mantén el script en ejecución
+try:
+    while True:
+        time.sleep(60)
+except KeyboardInterrupt:
+    print("Interrumpido por el usuario")
