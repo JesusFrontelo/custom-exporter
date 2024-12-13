@@ -6,6 +6,8 @@ User=prometheus_ci
 Group=prometheus
 Type=simple
 ExecStart=/usr/bin/python3 /opt/prometheus/custom_exporter/custom_exporter.py --role arn:aws:iam::726972211369:role/rl_prometheus-pro --port 9925 
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=default.target

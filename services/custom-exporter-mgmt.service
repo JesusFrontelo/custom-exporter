@@ -5,7 +5,10 @@ Description= Python Exporter for Management
 User=prometheus_ci
 Group=prometheus
 Type=simple
+ExecStartPre=/bin/sh -c 'while ! curl -s --connect-timeout 2 http://169.254.169.254/latest/meta-data/iam/security-credentials/; do sleep 5; done'
 ExecStart=/usr/bin/python3 /opt/prometheus/custom_exporter/custom_exporter.py --port 9900
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=default.target
