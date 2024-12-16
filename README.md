@@ -64,10 +64,4 @@ Once you have it running you can create a job in prometheus.yml.
 
 If you plan to add new metrics to the exporter, this info is useful to know where to config each thing.
 
-The first step is to define the metric at metrics_definition folder.
-
-For metrics definition go [here](./metrics_definition/)
-
-Then you need to set values to the metric and for each label of the metric. You can set this at gathers folder.
-
-To set values to metric and labels go [here](./gathers/)
+To see metrics, labels and where to add new ones go [here](./gathers/)
