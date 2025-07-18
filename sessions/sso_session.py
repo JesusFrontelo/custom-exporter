@@ -93,6 +93,7 @@ if role_arn:
     elb_client = autorefresh_session.client("elbv2",region_name='eu-west-1')
     cloudwatch_client = autorefresh_session.client("cloudwatch",region_name='eu-west-1')
     health_client = autorefresh_session.client("health",region_name='us-east-1')
+    iam_client = autorefresh_session.client("iam", region_name='us-east-1')
 
 else:
     # Utilizar las credenciales del perfil de instancia directamente
@@ -105,3 +106,4 @@ else:
     elb_client = boto3.client("elbv2", region_name='eu-west-1')
     cloudwatch_client = boto3.client("cloudwatch", region_name='eu-west-1')
     health_client = boto3.client("health",region_name='us-east-1')
+    iam_client = boto3.client("iam",region_name='us-east-1')
